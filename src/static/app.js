@@ -3,6 +3,37 @@ document.addEventListener("DOMContentLoaded", () => {
   const activitySelect = document.getElementById("activity");
   const signupForm = document.getElementById("signup-form");
   const messageDiv = document.getElementById("message");
+  const themeToggleBtn = document.getElementById("theme-toggle");
+
+  // Check for saved theme preference or respect OS theme setting
+  initTheme();
+
+  // Theme toggle functionality
+  themeToggleBtn.addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+    saveTheme(document.body.classList.contains("dark-mode"));
+  });
+
+  // Function to initialize theme based on local storage or system preference
+  function initTheme() {
+    const darkModeStored = localStorage.getItem("dark-mode");
+
+    if (darkModeStored !== null) {
+      // If theme was previously saved, use that preference
+      document.body.classList.toggle("dark-mode", darkModeStored === "true");
+    } else if (
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+    ) {
+      // If no saved preference, check system preference
+      document.body.classList.add("dark-mode");
+    }
+  }
+
+  // Function to save theme preference
+  function saveTheme(isDarkMode) {
+    localStorage.setItem("dark-mode", isDarkMode);
+  }
 
   // Function to fetch activities from API
   async function fetchActivities() {
@@ -18,8 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const activityCard = document.createElement("div");
         activityCard.className = "activity-card";
 
-        const spotsLeft =
-          details.max_participants - details.participants.length;
+        const spotsLeft = details.max_participants - details.participants.length;
 
         // Create participants HTML with delete icons instead of bullet points
         const participantsHTML =
